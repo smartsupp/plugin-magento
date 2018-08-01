@@ -1,0 +1,36 @@
+<?php
+
+use Smartsupp\ChatGenerator;
+
+require_once __DIR__ . '/../../../Chat/ChatGenerator.php';
+
+// @todo put into some config
+$config = @file_get_contents(__DIR__ . '/../../../etc/config.json');
+
+if ($config === FALSE) {
+	$config = ['active' => FALSE];
+} else {
+	$config = json_decode($config, JSON_OBJECT_AS_ARRAY);
+}
+
+if ($config['active']) {
+	$chat = new ChatGenerator($config['chat-id']);
+	$chat->setEmail($config['email']);
+	$chat->render(TRUE);
+}
+
+/**
+ // @todo obtain information about visitor
+$om = \Magento\Framework\App\ObjectManager::getInstance();
+
+$customerSession = $om->get('Magento\Customer\Model\Session');
+if ($customerSession->isLoggedIn()) {
+echo 'smartlook(\'tag\', \'email\', ' . json_encode($customerSession->getCustomer()->getEmail()) . ');';
+echo 'smartlook(\'tag\', \'name\', ' . json_encode($customerSession->getCustomer()->getName()) . ');';
+echo 'smartlook(\'tag\', \'id\', ' . json_encode($customerSession->getCustomer()->getId()) . ');';
+}
+ */
+
+if (isset($config['optional-code']) && $config['optional-code']) {
+	echo '<script>' . stripcslashes($config['optional-code']) . '</script>';
+}
