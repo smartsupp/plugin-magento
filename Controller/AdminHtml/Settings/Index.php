@@ -28,22 +28,6 @@ class Index extends Action
 
 	const CONFIG_PATH = __DIR__ . '/../../../etc/config.json';
 
-	/** @var PageFactory */
-	private $pageFactory;
-
-
-	// @todo seems to be unused - remove pageFactory
-
-	/**
-	 * @param Context $context
-	 */
-	public function __construct(Context $context)
-	{
-		parent::__construct($context);
-		$this->pageFactory = $this->_objectManager->create('Magento\Framework\View\Result\PageFactory');
-	}
-
-
 	public function execute()
 	{
 		$formAction = $message = $email = NULL;
