@@ -108,6 +108,10 @@ section .container.settings-container p {
 	font-weight: 400;
 }
 
+.intro .intro--image img {
+	margin: 50px 0;
+}
+
 section {
 	width: 100%;
 }
@@ -286,6 +290,10 @@ section {
 	font-size: 12px;
 }
 
+form#signUpForm div.checkbox.gdpr{
+	text-align: left;
+}
+
 .bold {
 	font-weight: bold;
 }
@@ -355,11 +363,11 @@ section {
 	}
 }
 
-.intro h3 {
-        color: #34670a;
-	margin: 40px auto 0px;
-}
 
 .intro h4 {
-	padding: 5px 0 20px;
+	padding: 28px 0 14px;
+}
+
+.green {
+	color: darkgreen;
 }
