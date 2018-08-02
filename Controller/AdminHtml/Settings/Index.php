@@ -8,7 +8,6 @@ use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
 use Smartsupp\Auth\Api;
-use Smartsupp\Smartsupp\Block\Adminhtml\SmartsuppBlock;
 
 require_once __DIR__ . '/../../../Auth/Api.php';
 require_once __DIR__ . '/../../../Auth/Request/HttpRequest.php';
@@ -50,16 +49,16 @@ class Index extends Action
 	{
 		$formAction = $message = $email = NULL;
 
-        $slaction = $this->getRequest()->getParam('slaction');
+        $ssaction = $this->getRequest()->getParam('ssaction');
         $email = $this->getRequest()->getParam('email');
         $password = $this->getRequest()->getParam('password');
         $code = $this->getRequest()->getParam('code');
 
-		if (isset($slaction)) {
-			switch ($slaction) {
+		if (isset($ssaction)) {
+			switch ($ssaction) {
 				case 'login':
 				case 'register':
-					$formAction = $slaction;
+					$formAction = $ssaction;
 					$api = new Api;
 					$data = array(
 						'email' => $email,
@@ -99,7 +98,7 @@ class Index extends Action
             $block->setFormAction($formAction);
             $block->setMessage($message);
             $block->setEmail($email ?: $this->_getOption('email'));
-            $block->setEnabled((bool) $this->_getOption('email', null));
+            $block->setActive((bool) $this->_getOption('active', false));
             $block->setOptionalCode($code ?: $this->_getOption('optional-code'));
         }
         return $resultPage;
