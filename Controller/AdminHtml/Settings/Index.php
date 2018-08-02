@@ -25,42 +25,62 @@ require_once __DIR__ . '/../../../Auth/Request/CurlRequest.php';
  */
 class Index extends Action
 {
+    const DOMAIN = 'smartsupp';
 
 	const CONFIG_PATH = __DIR__ . '/../../../etc/config.json';
+
+    /**
+     * @var PageFactory
+     */
+    protected $resultPageFactory;
+
+    /**
+     * Constructor
+     *
+     * @param Context     $context           context
+     * @param PageFactory $resultPageFactory page factory
+     */
+    public function __construct(Context $context, PageFactory $resultPageFactory)
+    {
+        parent::__construct($context);
+        $this->resultPageFactory = $resultPageFactory;
+    }
 
 	public function execute()
 	{
 		$formAction = $message = $email = NULL;
 
-		if (isset($_GET['ssaction'])) {
-			$action = (string) $_GET['ssaction'];
-			switch ($action) {
+        $slaction = $this->getRequest()->getParam('slaction');
+        $email = $this->getRequest()->getParam('email');
+        $password = $this->getRequest()->getParam('password');
+        $code = $this->getRequest()->getParam('code');
+
+		if (isset($slaction)) {
+			switch ($slaction) {
 				case 'login':
 				case 'register':
-					$formAction = $action;
+					$formAction = $slaction;
 					$api = new Api;
 					$data = array(
-						'email' => $_POST['email'],
-						'password' => $_POST['password'],
+						'email' => $email,
+						'password' => $password,
 					);
 					try {
 						$response = $formAction === 'login' ? $api->login($data) : $api->create($data + array(/*'partnerKey' => 'k717wrqdi5', */'lang' => 'en'));
 
 						if (isset($response['error'])) {
 							$message = $response['message'];
-							$email = $_POST['email'];
 						} else {
-							$this->activate($response['account']['key'], $_POST['email']);
+							$this->activate($response['account']['key'], $email);
 						}
 					} catch (Exception $e) {
 						$message = $e->getMessage();
-						$email = $_POST['email'];
 					}
 					break;
 				case 'update':
 					$message = 'Custom code was updated.';
 					$this->updateOptions(array(
-						'optional-code' => $_POST['code'],
+						'optional-code' => $code,
 					));
 					break;
 				case 'disable':
@@ -72,16 +92,17 @@ class Index extends Action
 			}
 		}
 
-		$config = @file_get_contents(self::CONFIG_PATH);
-		if ($config === FALSE) {
-			$config = ['active' => FALSE];
-		} else {
-			$config = json_decode($config, JSON_OBJECT_AS_ARRAY);
-		}
-		SmartsuppBlock::setVars($formAction, $message, $email, $config);
-
-		$this->_view->loadLayout();
-		$this->_view->renderLayout();
+        $resultPage = $this->resultPageFactory->create();
+        $block = $resultPage->getLayout()->getBlock('smartsupp.settings');
+        if ($block) {
+            $block->setDomain(self::DOMAIN);
+            $block->setFormAction($formAction);
+            $block->setMessage($message);
+            $block->setEmail($email ?: $this->_getOption('email'));
+            $block->setEnabled((bool) $this->_getOption('email', null));
+            $block->setOptionalCode($code ?: $this->_getOption('optional-code'));
+        }
+        return $resultPage;
 	}
 
 
@@ -105,6 +126,38 @@ class Index extends Action
 	}
 
 
+    /**
+     * Get options from file
+     *
+     * @return array
+     */
+    private function _getOptions()
+    {
+        $config = @file_get_contents(self::CONFIG_PATH);
+        if (!$config) {
+            $config = ['active' => FALSE];
+        } else {
+            $config = json_decode($config, JSON_OBJECT_AS_ARRAY);
+        }
+        return $config;
+    }
+
+
+    /**
+     * Get option from file
+     *
+     * @param String $name    option name
+     * @param String $default default value
+     *
+     * @return String
+     */
+    private function _getOption($name, $default = null)
+    {
+        $options = $this->_getOptions();
+        return isset($options[$name]) ? $options[$name] : $default;
+    }
+
+
 	private function updateOptions(array $options)
 	{
 		$config = @file_get_contents(self::CONFIG_PATH);
@@ -117,5 +170,4 @@ class Index extends Action
 		}
 		file_put_contents(self::CONFIG_PATH, json_encode($config));
 	}
-
 }

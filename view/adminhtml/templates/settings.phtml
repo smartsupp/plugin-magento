@@ -1,13 +1,7 @@
-<?php
-$message = $block->getMessage();
-$formAction = $block->getFormAction();
-$email = $block->getEmail();
-$options = $block->getOptions();
-?>
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,700&amp;subset=latin,latin-ext" rel="stylesheet" type="text/css">
 
 <div class="wrap" id="content">
-	<?php if ($options['active']) { ?>
+	<?php if ($this->getEnabled()) { ?>
 		<main role="main">
 			<div id="third">
 				<section class="top-bar">
@@ -18,7 +12,7 @@ $options = $block->getOptions();
 				<section class="deactivate">
 					<div class="row">
 						<p class="bold">
-							<span class="left"><?= isset($options['email']) ? $options['email'] : '' ?></span>
+							<span class="left"><?= $this->getEmail() ?: '' ?></span>
 							<span class="right"><a class="js-action-disable" href="javascript: void(0);">Deactivate Chat</a></span>
 						</p>
 						<div class="clear"></div>
@@ -43,15 +37,15 @@ $options = $block->getOptions();
 						<div class="section--body">
 							<form action="" method="post" id="settingsForm" class="js-code-form form-horizontal" autocomplete="off">
 								<div class="alerts">
-									<?php if ($message) { ?>
+									<?php if ($this->getMessage()) { ?>
 										<div class="alert alert-success">
-											<?= $message ?>
+											<?= $this->getMessage() ?>
 										</div>
 									<?php } ?>
 								</div>
 								<div class="form-group">
 									<div class="col-xs-12">
-										<textarea name="code" id="textAreaSettings" cols="30" rows="10"><?= stripcslashes(isset($options['optional-code']) ? $options['optional-code'] : '') ?></textarea>
+										<textarea name="code" id="textAreaSettings" cols="30" rows="10"><?= stripcslashes($this->getOptionalCode() ?: '') ?></textarea>
 									</div>
 								</div>
 								<div class="form-group">
@@ -69,7 +63,7 @@ $options = $block->getOptions();
 			</div>
 		</main>
 	<?php } else { ?>
-		<main role="main" class="sections" id="home"<?php if ($formAction) { ?> style="display: none;"<?php } ?>>
+		<main role="main" class="sections" id="home"<?php if ($this->getFormAction()) { ?> style="display: none;"<?php } ?>>
 			<div id="first">
 				<section class="top-bar">
 					<div class="">
@@ -126,14 +120,14 @@ $options = $block->getOptions();
 				</section>
 			</div>
 		</main>
-		<main role="main" class="sections" id="connect"<?php if (!$formAction) { ?> style="display: none;"<?php } ?>>
+		<main role="main" class="sections" id="connect"<?php if (!$this->getFormAction()) { ?> style="display: none;"<?php } ?>>
 			<div id="second">
 				<section class="top-bar">
 					<div>
 						<a href="javascript: void(0);" class="js-close-form">
 							<img src="<?php echo $this->getViewFileUrl('Smartsupp_Smartsupp::images/logo.png') ?>" alt="smartsupp logo" />
 							<a href="javascript: void(0);" class="btn btn-default" data-toggle-form data-multitext data-register="Connect existing account" data-login="Create a free account">
-								<?= $formAction === 'register' ? 'Connect existing account' : 'Create a free account' ?>
+								<?= $this->getFormAction() === 'register' ? 'Connect existing account' : 'Create a free account' ?>
 							</a>
 						</a>
 					</div>
@@ -143,16 +137,16 @@ $options = $block->getOptions();
 						<div class="form-container">
 							<div class="section--header">
 								<h1 class="lead" data-multitext data-login="Connect existing account" data-register="Create a free account">
-									<?= $formAction === 'login' ? 'Connect existing account' : 'Create a free account' ?>
+									<?= $this->getFormAction() === 'login' ? 'Connect existing account' : 'Create a free account' ?>
 								</h1>
 							</div>
 							<div class="section--body">
 								<div class="form--inner">
-									<form action="" method="post" id="signUpForm" class="form-horizontal<?= $formAction ? (' js-' . $formAction . '-form') : '' ?>" data-toggle-class autocomplete="off">
+									<form action="" method="post" id="signUpForm" class="form-horizontal<?= $this->getFormAction() ? (' js-' . $formAction . '-form') : '' ?>" data-toggle-class autocomplete="off">
 										<div class="alerts">
-											<?php if ($message) { ?>
+											<?php if ($this->getMessage()) { ?>
 												<div class="alert alert-danger js-clear">
-													<?= $message ?>
+													<?= $this->getMessage() ?>
 												</div>
 											<?php } ?>
 										</div>
@@ -161,7 +155,7 @@ $options = $block->getOptions();
 											<div class="col-xs-12">
 												<div class="input-group">
 													<span class="input-group-addon hidden-xs" style="min-width: 150px;">E-mail</span>
-													<input type="email" class="form-control input-lg" name="email" id="frm-signUp-form-email" required="" value="<?= isset($email) ? $email : '' ?>">
+													<input type="email" class="form-control input-lg" name="email" id="frm-signUp-form-email" required="" value="<?= $this->getEmail() ?: '' ?>">
 												</div>
 											</div>
 										</div>
@@ -178,7 +172,7 @@ $options = $block->getOptions();
 											<div class="col-xs-12 form-button">
 												<div class="loader"></div>
 												<button type="submit" class="btn btn-primary btn-lg btn-block" name="_submit" data-multitext data-login="Connect account" data-register="Sign up">
-													<?= $formAction === 'login' ? 'Connect account' : 'Sign up' ?>
+													<?= $this->getFormAction() === 'login' ? 'Connect account' : 'Sign up' ?>
 												</button>
 											</div>
 										</div>
