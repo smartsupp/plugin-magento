@@ -168,6 +168,11 @@
 												</div>
 											</div>
 										</div>
+                                        <div class="gdpr checkbox">
+                                            <label for="frm-signUp-form-termsConsent">
+                                                <input <?= !empty($this->getTermsConsent()) ? 'checked="checked"' : '' ?> value="1" type="checkbox" name="termsConsent" id="frm-signUp-form-termsConsent" required="">&nbsp;I have read and agree with <a href="https://www.smartsupp.com/terms" target="_blank">Terms</a> and <a href="https://www.smartsupp.com/dpa" target="_blank">DPA</a>
+                                            </label>
+                                        </div>
 										<div class="form-group">
 											<div class="col-xs-12 form-button">
 												<div class="loader"></div>

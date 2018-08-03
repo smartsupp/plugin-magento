@@ -50,12 +50,13 @@ class Index extends Action
 
 	public function execute()
 	{
-		$formAction = $message = $email = NULL;
+		$formAction = $message = NULL;
 
         $ssaction = $this->getRequest()->getParam('ssaction');
         $email = $this->getRequest()->getParam('email');
         $password = $this->getRequest()->getParam('password');
         $code = $this->getRequest()->getParam('code');
+        $termsConsent = $this->getRequest()->getParam('termsConsent');
 
         if (self::MSG_CACHE_GLOBAL) {
             $this->messageManager->addNotice(self::MSG_CACHE);
@@ -70,6 +71,7 @@ class Index extends Action
 					$data = array(
 						'email' => $email,
 						'password' => $password,
+                        'consentTerms' => 1,
 					);
 					try {
 						$response = $formAction === 'login' ? $api->login($data) : $api->create($data + array(/*'partnerKey' => 'k717wrqdi5', */'lang' => 'en'));
@@ -109,6 +111,7 @@ class Index extends Action
             $block->setEmail($email ?: $this->_getOption('email'));
             $block->setActive((bool) $this->_getOption('active', false));
             $block->setOptionalCode($code ?: $this->_getOption('optional-code'));
+            $block->setTermsConsent($termsConsent);
         }
         return $resultPage;
 	}

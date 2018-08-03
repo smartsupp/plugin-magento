@@ -1,34 +1,48 @@
 require(['jquery'], function ($) {
 	$(function () {
-		var lastOpen = null;
+        var lastOpen = null;
 
-		function openForm(type) {
-			lastOpen = type;
-			updateTexts(type);
-			updateClass(type);
-			$('#home').hide();
-			$('#connect').show();
-			$('.js-clear').hide();
-		}
+        function openForm(type) {
+            lastOpen = type;
+            updateTexts(type);
+            updateClass(type);
+            $('#home').hide();
+            $('#connect').show();
+            $('.js-clear').hide();
+            showGdpr(type == 'register');
+        }
 
-		function closeForm() {
-			$('#connect').hide();
-			$('#home').show();
-		}
+        function closeForm() {
+            $('#connect').hide();
+            $('#home').show();
+        }
 
-		function updateClass(type) {
-			if (type === 'login') {
-				$('[data-toggle-class]').addClass('js-login-form').removeClass('js-register-form');
-			} else {
-				$('[data-toggle-class]').removeClass('js-login-form').addClass('js-register-form');
-			}
-		}
+        function updateClass(type) {
+            if (type === 'login') {
+                $('[data-toggle-class]').addClass('js-login-form').removeClass('js-register-form');
+            } else {
+                $('[data-toggle-class]').removeClass('js-login-form').addClass('js-register-form');
+            }
+        }
 
-		function updateTexts(type) {
-			$('[data-multitext]').each(function () {
-				$(this).text($(this).data(type));
-			})
-		}
+        function updateTexts(type) {
+            $('[data-multitext]').each(function () {
+                $(this).text($(this).data(type));
+            })
+        }
+
+        function showGdpr(show) {
+            var $gdprContainer = $('.gdpr.checkbox');
+            var $checkbox = $gdprContainer.find('input');
+
+            if (show) {
+                $gdprContainer.show();
+                $checkbox.prop('disabled', false);
+            } else {
+                $gdprContainer.hide();
+                $checkbox.prop('disabled', true);
+            }
+        }
 
 		var $content = $('#content'), $document = $(document);
 
