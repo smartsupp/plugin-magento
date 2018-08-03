@@ -28,7 +28,7 @@ class Index extends Action
 
 	const CONFIG_PATH = __DIR__ . '/../../../etc/config.json';
 
-    const MSG_CACHE = 'Changes do not apply to Smartlook plugin? Refresh Magento cache.',
+    const MSG_CACHE = 'Changes do not apply to Smartsupp plugin? Refresh Magento cache.',
         MSG_CACHE_GLOBAL = true; // show permanent message about cache refresh in plugin?
 
     /**
