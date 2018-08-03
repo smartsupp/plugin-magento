@@ -28,6 +28,9 @@ class Index extends Action
 
 	const CONFIG_PATH = __DIR__ . '/../../../etc/config.json';
 
+    const MSG_CACHE = 'Changes do not apply to Smartlook plugin? Refresh Magento cache.',
+        MSG_CACHE_GLOBAL = true; // show permanent message about cache refresh in plugin?
+
     /**
      * @var PageFactory
      */
@@ -54,6 +57,10 @@ class Index extends Action
         $password = $this->getRequest()->getParam('password');
         $code = $this->getRequest()->getParam('code');
 
+        if (self::MSG_CACHE_GLOBAL) {
+            $this->messageManager->addNotice(self::MSG_CACHE);
+        }
+
 		if (isset($ssaction)) {
 			switch ($ssaction) {
 				case 'login':
@@ -71,19 +78,21 @@ class Index extends Action
 							$message = $response['message'];
 						} else {
 							$this->activate($response['account']['key'], $email);
+                            $message = self::MSG_CACHE;
 						}
 					} catch (Exception $e) {
 						$message = $e->getMessage();
 					}
 					break;
 				case 'update':
-					$message = 'Custom code was updated.';
+					$message = 'Custom code was updated. ' . self::MSG_CACHE;
 					$this->updateOptions(array(
 						'optional-code' => $code,
 					));
 					break;
 				case 'disable':
 					$this->deactivate();
+                    $message = self::MSG_CACHE;
 					break;
 				default:
 					$message = 'Invalid action';
