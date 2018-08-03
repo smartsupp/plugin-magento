@@ -9,10 +9,6 @@ use Magento\Backend\Model\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
 use Smartsupp\Auth\Api;
 
-require_once __DIR__ . '/../../../Auth/Api.php';
-require_once __DIR__ . '/../../../Auth/Request/HttpRequest.php';
-require_once __DIR__ . '/../../../Auth/Request/CurlRequest.php';
-
 /**
  * Index Controller Class.
  *

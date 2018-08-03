@@ -11,5 +11,9 @@
     "psr-4": {
       "Smartsupp\\Smartsupp\\": ""
     }
+  },
+  "require": {
+    "smartsupp/chat-code-generator": "1.*",
+    "smartsupp/php-auth-client": "1.*"
   }
 }
