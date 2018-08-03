@@ -142,7 +142,7 @@
 							</div>
 							<div class="section--body">
 								<div class="form--inner">
-									<form action="" method="post" id="signUpForm" class="form-horizontal<?= $this->getFormAction() ? (' js-' . $formAction . '-form') : '' ?>" data-toggle-class autocomplete="off">
+									<form action="" method="post" id="signUpForm" class="form-horizontal<?= $this->getFormAction() ? (' js-' . $this->getFormAction() . '-form') : '' ?>" data-toggle-class autocomplete="off">
 										<div class="alerts">
 											<?php if ($this->getMessage()) { ?>
 												<div class="alert alert-danger js-clear">
