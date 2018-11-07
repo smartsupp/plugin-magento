@@ -1,7 +1,4 @@
 <?php
-/**
- * @author Tomáš Blatný
- */
 
 use Magento\Framework\Component\ComponentRegistrar;
 

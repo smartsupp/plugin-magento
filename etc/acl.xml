@@ -6,6 +6,13 @@
 				<resource id="Smartsupp_Smartsupp::menu" title="Smartsupp" sortOrder="10" >
 					<resource id="Smartsupp_Smartsupp::settings" title="Settings" sortOrder="0" />
 				</resource>
+				<resource id="Magento_Backend::stores">
+					<resource id="Magento_Backend::stores_settings">
+						<resource id="Magento_Config::config">
+							<resource id="Smartsupp_Smartsupp::config" title="Extension config" sortOrder="50" />
+						</resource>
+					</resource>
+				</resource>
 			</resource>
 		</resources>
 	</acl>

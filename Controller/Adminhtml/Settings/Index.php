@@ -7,6 +7,8 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\App\ProductMetadataInterface;
+use Smartsupp\Smartsupp\Helper\Data;
 use Smartsupp\Auth\Api;
 
 /**
@@ -20,6 +22,11 @@ use Smartsupp\Auth\Api;
  */
 class Index extends Action
 {
+    /**
+     * Smartsupp partner key for Magento platform
+     */
+    const PARNER_KEY = '1p395yrdn9';
+
     const DOMAIN = 'smartsupp';
 
 	const CONFIG_PATH = __DIR__ . '/../../../etc/config.json';
@@ -33,15 +40,27 @@ class Index extends Action
     protected $resultPageFactory;
 
     /**
+     * @var ProductMetadataInterface
+     */
+    protected $productMetadata;
+
+    /**
+     * @var Data
+     */
+    protected $dataHelper;
+
+    /**
      * Constructor
      *
      * @param Context     $context           context
      * @param PageFactory $resultPageFactory page factory
      */
-    public function __construct(Context $context, PageFactory $resultPageFactory)
+    public function __construct(Context $context, PageFactory $resultPageFactory, ProductMetadataInterface $productMetadata, Data $dataHelper)
     {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
+        $this->productMetadata = $productMetadata;
+        $this->dataHelper = $dataHelper;
     }
 
 	public function execute()
@@ -68,6 +87,8 @@ class Index extends Action
 						'email' => $email,
 						'password' => $password,
                         'consentTerms' => 1,
+                        'platform' => 'Magento ' . $this->getMagentoVersion(),
+                        'partnerKey' => self::PARNER_KEY,
 					);
 					try {
 						$response = $formAction === 'login' ? $api->login($data) : $api->create($data + array(/*'partnerKey' => 'k717wrqdi5', */'lang' => 'en'));
@@ -85,7 +106,7 @@ class Index extends Action
 				case 'update':
 					$message = 'Custom code was updated. ' . self::MSG_CACHE;
 					$this->updateOptions(array(
-						'optional-code' => $code,
+						'optionalCode' => (string) $code,
 					));
 					break;
 				case 'disable':
@@ -106,7 +127,7 @@ class Index extends Action
             $block->setMessage($message);
             $block->setEmail($email ?: $this->_getOption('email'));
             $block->setActive((bool) $this->_getOption('active', false));
-            $block->setOptionalCode($code ?: $this->_getOption('optional-code'));
+            $block->setOptionalCode($this->_getOption('optionalCode'));
             $block->setTermsConsent($termsConsent);
         }
         return $resultPage;
@@ -116,8 +137,8 @@ class Index extends Action
 	private function activate($chatId, $email)
 	{
 		$this->updateOptions(array(
-			'active' => TRUE,
-			'chat-id' => (string) $chatId,
+			'active' => 1,
+			'chatId' => (string) $chatId,
 			'email' => (string) $email,
 		));
 	}
@@ -126,9 +147,9 @@ class Index extends Action
 	private function deactivate()
 	{
 		$this->updateOptions(array(
-			'active' => FALSE,
-			'chat-id' => NULL,
-			'email' => NULL
+			'active' => 0,
+			'chatId' => null,
+			'email' => null
 		));
 	}
 
@@ -151,7 +172,7 @@ class Index extends Action
 
 
     /**
-     * Get option from file
+     * Get option from Magento Smartsupp extension config.
      *
      * @param String $name    option name
      * @param String $default default value
@@ -160,21 +181,22 @@ class Index extends Action
      */
     private function _getOption($name, $default = null)
     {
-        $options = $this->_getOptions();
-        return isset($options[$name]) ? $options[$name] : $default;
+        $value = $this->dataHelper->getGeneralConfig($name);
+
+        // if option is null (possibly not set in the past) return default value
+        return !is_null($value) ? $value : $default;
     }
 
 
 	private function updateOptions(array $options)
 	{
-		$config = @file_get_contents(self::CONFIG_PATH);
-		if ($config === FALSE) {
-			$config = '{}';
-		}
-		$config = json_decode($config);
 		foreach ($options as $key => $value) {
-			$config->$key = $value;
+            $this->dataHelper->setGeneralConfig($key, $value);
 		}
-		file_put_contents(self::CONFIG_PATH, json_encode($config));
 	}
+
+    private function getMagentoVersion()
+    {
+        return $this->productMetadata->getVersion();
+    }
 }
