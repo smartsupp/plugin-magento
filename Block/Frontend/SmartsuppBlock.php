@@ -5,6 +5,7 @@ namespace Smartsupp\Smartsupp\Block\Frontend;
 use Magento\Backend\Block\Template;
 use \Magento\Backend\Block\Template\Context;
 use Smartsupp\Smartsupp\Helper\Data;
+use Magento\Framework\App\ProductMetadataInterface;
 
 /**
  * SmartsuppBlock Template Class.
@@ -22,12 +23,19 @@ class SmartsuppBlock extends Template
      */
     protected $dataHelper;
 
+    /**
+     * @var ProductMetadataInterface
+     */
+    protected $productMetadata;
+
     public function __construct(
         Context $context,
         array $data = [],
+        ProductMetadataInterface $productMetadata,
         Data $dataHelper
     ) {
         parent::__construct($context, $data);
+        $this->productMetadata = $productMetadata;
         $this->dataHelper = $dataHelper;
     }
 
@@ -45,5 +53,10 @@ class SmartsuppBlock extends Template
 
         // if option is null (possibly not set in the past) return default value
         return !is_null($value) ? $value : $default;
+    }
+
+    public function getMagentoVersion()
+    {
+        return $this->productMetadata->getVersion();
     }
 }

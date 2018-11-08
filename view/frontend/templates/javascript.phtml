@@ -4,6 +4,7 @@ use Smartsupp\ChatGenerator;
 
 if ($block->_getOption('active')) {
 	$chat = new ChatGenerator($block->_getOption('chatId'));
+    $chat->setPlatform("Magento " . $block->getMagentoVersion());
 	$chat->setEmail($block->_getOption('email'));
 	$chat->render(true);
 }
