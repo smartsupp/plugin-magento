@@ -107,4 +107,31 @@ class Data extends AbstractHelper
     {
         return $this->setConfigValue(self::XML_PATH . $code, $value);
     }
+
+    /**
+     * Will remove the config entry value by its last path identifier.
+     *
+     * @param $code field name (not a full one)
+     */
+    public function deleteGeneralConfig($code)
+    {
+        $this->deleteConfigValue(self::XML_PATH . $code);
+    }
+
+    /**
+     * Will remove the config entry
+     *
+     * @param $field field name
+     */
+    private function deleteConfigValue($field)
+    {
+        $this->resourceConfig->deleteConfig(
+            $field,
+            ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
+            $scopeId = 0
+        );
+
+        // unset in helper cache
+        unset($this->cacheValues[$field]);
+    }
 }

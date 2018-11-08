@@ -29,8 +29,6 @@ class Index extends Action
 
     const DOMAIN = 'smartsupp';
 
-	const CONFIG_PATH = __DIR__ . '/../../../etc/config.json';
-
     const MSG_CACHE = 'Changes do not apply to Smartsupp plugin? Refresh Magento cache.',
         MSG_CACHE_GLOBAL = true; // show permanent message about cache refresh in plugin?
 
@@ -50,10 +48,11 @@ class Index extends Action
     protected $dataHelper;
 
     /**
-     * Constructor
-     *
-     * @param Context     $context           context
-     * @param PageFactory $resultPageFactory page factory
+     * Index constructor.
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     * @param ProductMetadataInterface $productMetadata
+     * @param Data $dataHelper
      */
     public function __construct(Context $context, PageFactory $resultPageFactory, ProductMetadataInterface $productMetadata, Data $dataHelper)
     {
@@ -152,24 +151,6 @@ class Index extends Action
 			'email' => null
 		));
 	}
-
-
-    /**
-     * Get options from file
-     *
-     * @return array
-     */
-    private function _getOptions()
-    {
-        $config = @file_get_contents(self::CONFIG_PATH);
-        if (!$config) {
-            $config = ['active' => FALSE];
-        } else {
-            $config = json_decode($config, JSON_OBJECT_AS_ARRAY);
-        }
-        return $config;
-    }
-
 
     /**
      * Get option from Magento Smartsupp extension config.
