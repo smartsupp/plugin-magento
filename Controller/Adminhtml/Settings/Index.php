@@ -54,17 +54,21 @@ class Index extends Action
      * @param ProductMetadataInterface $productMetadata
      * @param Data $dataHelper
      */
-    public function __construct(Context $context, PageFactory $resultPageFactory, ProductMetadataInterface $productMetadata, Data $dataHelper)
-    {
+    public function __construct(
+        Context $context,
+        PageFactory $resultPageFactory,
+        ProductMetadataInterface $productMetadata,
+        Data $dataHelper
+    ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
         $this->productMetadata = $productMetadata;
         $this->dataHelper = $dataHelper;
     }
 
-	public function execute()
-	{
-		$formAction = $message = NULL;
+    public function execute()
+    {
+        $formAction = $message = null;
 
         $ssaction = $this->getRequest()->getParam('ssaction');
         $email = $this->getRequest()->getParam('email');
@@ -76,47 +80,43 @@ class Index extends Action
             $this->messageManager->addNotice(self::MSG_CACHE);
         }
 
-		if (isset($ssaction)) {
-			switch ($ssaction) {
-				case 'login':
-				case 'register':
-					$formAction = $ssaction;
-					$api = new Api;
-					$data = array(
-						'email' => $email,
-						'password' => $password,
-                        'consentTerms' => 1,
-                        'platform' => 'Magento ' . $this->getMagentoVersion(),
-                        'partnerKey' => self::PARNER_KEY,
-					);
-					try {
-						$response = $formAction === 'login' ? $api->login($data) : $api->create($data + array(/*'partnerKey' => 'k717wrqdi5', */'lang' => 'en'));
+        switch ($ssaction) {
+            case 'login':
+            case 'register':
+                $formAction = $ssaction;
+                $api = new Api;
+                $data = [
+                    'email' => $email,
+                    'password' => $password,
+                    'consentTerms' => 1,
+                    'platform' => 'Magento ' . $this->getMagentoVersion(),
+                    'partnerKey' => self::PARNER_KEY,
+                ];
+                try {
+                    $response = $formAction === 'login' ? $api->login($data) : $api->create($data + ['lang' => 'en']);
 
-						if (isset($response['error'])) {
-							$message = $response['message'];
-						} else {
-							$this->activate($response['account']['key'], $email);
-                            $message = self::MSG_CACHE;
-						}
-					} catch (Exception $e) {
-						$message = $e->getMessage();
-					}
-					break;
-				case 'update':
-					$message = 'Custom code was updated. ' . self::MSG_CACHE;
-					$this->updateOptions(array(
-						'optionalCode' => (string) $code,
-					));
-					break;
-				case 'disable':
-					$this->deactivate();
-                    $message = self::MSG_CACHE;
-					break;
-				default:
-					$message = 'Invalid action';
-					break;
-			}
-		}
+                    if (isset($response['error'])) {
+                        $message = $response['message'];
+                    } else {
+                        $this->activate($response['account']['key'], $email);
+                        $message = self::MSG_CACHE;
+                    }
+                } catch (Exception $e) {
+                    $message = $e->getMessage();
+                }
+                break;
+            case 'update':
+                $message = 'Custom code was updated. ' . self::MSG_CACHE;
+                $this->updateOptions([
+                    'optionalCode' => (string) $code,
+                ]);
+                break;
+            case 'disable':
+                $this->deactivate();
+                $message = self::MSG_CACHE;
+                break;
+                /* no default clause. If there is some not existing action just do nothing  */
+        }
 
         $resultPage = $this->resultPageFactory->create();
         $block = $resultPage->getLayout()->getBlock('smartsupp.settings');
@@ -130,27 +130,25 @@ class Index extends Action
             $block->setTermsConsent($termsConsent);
         }
         return $resultPage;
-	}
+    }
 
+    private function activate($chatId, $email)
+    {
+        $this->updateOptions([
+            'active' => 1,
+            'chatId' => (string) $chatId,
+            'email' => (string) $email,
+        ]);
+    }
 
-	private function activate($chatId, $email)
-	{
-		$this->updateOptions(array(
-			'active' => 1,
-			'chatId' => (string) $chatId,
-			'email' => (string) $email,
-		));
-	}
-
-
-	private function deactivate()
-	{
-		$this->updateOptions(array(
-			'active' => 0,
-			'chatId' => null,
-			'email' => null
-		));
-	}
+    private function deactivate()
+    {
+        $this->updateOptions([
+            'active' => 0,
+            'chatId' => null,
+            'email' => null
+        ]);
+    }
 
     /**
      * Get option from Magento Smartsupp extension config.
@@ -165,16 +163,17 @@ class Index extends Action
         $value = $this->dataHelper->getGeneralConfig($name);
 
         // if option is null (possibly not set in the past) return default value
-        return !is_null($value) ? $value : $default;
+        return $value !== null ? $value : $default;
     }
 
-
-	private function updateOptions(array $options)
-	{
-		foreach ($options as $key => $value) {
+    private function updateOptions(array $options)
+    {
+        foreach ($options as $key => $value) {
             $this->dataHelper->setGeneralConfig($key, $value);
-		}
-	}
+        }
+
+        $this->dataHelper->clearGeneralConfigCache();
+    }
 
     private function getMagentoVersion()
     {

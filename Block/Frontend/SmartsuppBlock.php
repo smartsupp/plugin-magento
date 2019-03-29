@@ -6,6 +6,7 @@ use Magento\Backend\Block\Template;
 use \Magento\Backend\Block\Template\Context;
 use Smartsupp\Smartsupp\Helper\Data;
 use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\ObjectManagerInterface;
 
 /**
  * SmartsuppBlock Template Class.
@@ -28,15 +29,22 @@ class SmartsuppBlock extends Template
      */
     protected $productMetadata;
 
+    /**
+     * @var ObjectManagerInterface
+     */
+    protected $objectManager;
+
     public function __construct(
         Context $context,
         array $data = [],
         ProductMetadataInterface $productMetadata,
-        Data $dataHelper
+        Data $dataHelper,
+        ObjectManagerInterface $objectManager
     ) {
         parent::__construct($context, $data);
         $this->productMetadata = $productMetadata;
         $this->dataHelper = $dataHelper;
+        $this->objectManager = $objectManager;
     }
 
     /**
@@ -52,9 +60,22 @@ class SmartsuppBlock extends Template
         $value = $this->dataHelper->getGeneralConfig($name);
 
         // if option is null (possibly not set in the past) return default value
-        return !is_null($value) ? $value : $default;
+        return $value !== null ? $value : $default;
     }
 
+    /**
+     * @see https://github.com/magento/magento2/issues/3294 for most reliable way we use compatible with Magento 2.0+
+     * @return mixed
+     */
+    public function getCustomerSession() {
+        return $this->objectManager->create('Magento\Customer\Model\SessionFactory')->create();
+    }
+
+    /**
+     * Load Magento version
+     *
+     * @return string
+     */
     public function getMagentoVersion()
     {
         return $this->productMetadata->getVersion();

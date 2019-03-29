@@ -36,11 +36,13 @@ class Uninstall implements UninstallInterface
     {
         $setup->startSetup();
 
-        $configMapping = array('active', 'chatId', 'email', 'optionalCode');
+        $configMapping = ['active', 'chatId', 'email', 'optionalCode'];
 
         foreach ($configMapping as $name) {
             $this->dataHelper->deleteGeneralConfig($name);
         }
+
+        $this->dataHelper->clearGeneralConfigCache();
 
         $setup->endSetup();
     }

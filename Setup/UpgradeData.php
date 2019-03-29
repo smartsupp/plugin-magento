@@ -12,7 +12,7 @@ use Smartsupp\Smartsupp\Helper\Data;
  * - Config Migration from version 2.0.1 JSON file store to 2.0.2+ Magento config way
  *
  */
-class UpgradeData implements  UpgradeDataInterface
+class UpgradeData implements UpgradeDataInterface
 {
     const CONFIG_PATH = '/../etc/config.json';
 
@@ -46,7 +46,7 @@ class UpgradeData implements  UpgradeDataInterface
             $this->migrateConfig();
 
             // remove old json file
-            if(file_exists($this->getConfigPath())) {
+            if (file_exists($this->getConfigPath())) {
                 unlink($this->getConfigPath());
             }
         }
@@ -60,19 +60,19 @@ class UpgradeData implements  UpgradeDataInterface
     private function migrateConfig()
     {
         // no config file, skip
-        if(!file_exists($this->getConfigPath())) {
+        if (!file_exists($this->getConfigPath())) {
             return;
         }
 
         $configJson = file_get_contents($this->getConfigPath());
         $configData = json_decode($configJson, true);
 
-        $configMapping = array(
+        $configMapping = [
             'active' => 'active',
             'chat-id' => 'chatId',
             'email' => 'email',
             'optional-code' => 'optionalCode',
-        );
+        ];
 
         foreach ($configMapping as $oldName => $newName) {
             // put into new config file - native Magento one

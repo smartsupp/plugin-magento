@@ -3,16 +3,20 @@
 use Smartsupp\ChatGenerator;
 
 if ($block->_getOption('active')) {
-	$chat = new ChatGenerator($block->_getOption('chatId'));
+    $chat = new ChatGenerator($block->_getOption('chatId'));
     $chat->setPlatform("Magento " . $block->getMagentoVersion());
-	$chat->setEmail($block->_getOption('email'));
-	$chat->render(true);
-}
+    $chat->setEmail($block->_getOption('email'));
 
-/**
- // @todo obtain information about visitor
- */
+    $customerSession = $block->getCustomerSession();
 
-if ($optionalCode = $block->_getOption('optionalCode')) {
-	echo '<script>' . stripcslashes($optionalCode) . '</script>';
+    if ($customerSession !== null && $customerSession->isLoggedIn()) {
+        $chat->setName($block->escapeHtml($customerSession->getCustomer()->getName()));
+        $chat->setVariable('id', 'User ID', $block->escapeHtml($customerSession->getCustomer()->getId()));
+    }
+
+    $chat->render(true);
+
+    if ($optionalCode = $block->_getOption('optionalCode')) {
+        echo '<script>' . /* @noEscape */ stripcslashes($optionalCode) . '</script>';
+    }
 }

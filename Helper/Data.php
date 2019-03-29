@@ -2,6 +2,7 @@
 
 namespace Smartsupp\Smartsupp\Helper;
 
+use Magento\Framework\App\Cache\Type\Config as CacheConfig;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\ObjectManagerInterface;
@@ -9,6 +10,7 @@ use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Cache\TypeListInterface;
 
 /**
  * Data Helper.
@@ -31,18 +33,27 @@ class Data extends AbstractHelper
      */
     protected $cacheValues;
 
+    /**
+     * @var TypeListInterface
+     */
+    protected $cacheTypeList;
+
     const XML_PATH = 'smartsupp/chat/';
 
     /**
      * Data constructor.
      * @param Context $context
      * @param Config $resourceConfig
+     * @param TypeListInterface $cacheTypeList
      */
-    public function __construct(Context $context,
-                                Config $resourceConfig
+    public function __construct(
+        Context $context,
+        Config $resourceConfig,
+        TypeListInterface $cacheTypeList
     ) {
         $this->resourceConfig = $resourceConfig;
-        $this->cacheValues = array();
+        $this->cacheValues = [];
+        $this->cacheTypeList = $cacheTypeList;
         parent::__construct($context);
     }
 
@@ -61,7 +72,9 @@ class Data extends AbstractHelper
             return $this->cacheValues[$field];
         } else {
             return $this->scopeConfig->getValue(
-                $field, ScopeInterface::SCOPE_STORE, $storeId
+                $field,
+                ScopeInterface::SCOPE_STORE,
+                $storeId
             );
         }
     }
@@ -116,6 +129,15 @@ class Data extends AbstractHelper
     public function deleteGeneralConfig($code)
     {
         $this->deleteConfigValue(self::XML_PATH . $code);
+    }
+
+    /**
+     * Clear general config.
+     * @see https://magento.stackexchange.com/questions/92917/magento-2-programmatically-add-a-value-to-core-config-data
+     */
+    public function clearGeneralConfigCache()
+    {
+        $this->cacheTypeList->cleanType(CacheConfig::TYPE_IDENTIFIER);
     }
 
     /**
