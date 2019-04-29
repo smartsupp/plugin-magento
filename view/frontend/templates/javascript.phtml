@@ -5,13 +5,14 @@ use Smartsupp\ChatGenerator;
 if ($block->_getOption('active')) {
     $chat = new ChatGenerator($block->_getOption('chatId'));
     $chat->setPlatform("Magento " . $block->getMagentoVersion());
-    $chat->setEmail($block->_getOption('email'));
 
     $customerSession = $block->getCustomerSession();
 
     if ($customerSession !== null && $customerSession->isLoggedIn()) {
-        $chat->setName($block->escapeHtml($customerSession->getCustomer()->getName()));
-        $chat->setVariable('id', 'User ID', $block->escapeHtml($customerSession->getCustomer()->getId()));
+        $customer = $customerSession->getCustomer();
+        $chat->setEmail($block->escapeHtml($customer->getEmail()));
+        $chat->setName($block->escapeHtml($customer->getName()));
+        $chat->setVariable('id', 'User ID', $block->escapeHtml($customer->getId()));
     }
 
     $chat->render(true);
