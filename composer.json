@@ -13,7 +13,7 @@
     }
   },
   "require": {
-    "smartsupp/chat-code-generator": "1.*",
+    "smartsupp/chat-code-generator": "*",
     "smartsupp/php-partner-client": "1.*"
   }
 }
