@@ -36,10 +36,10 @@ class SmartsuppBlock extends Template
 
     public function __construct(
         Context $context,
-        array $data = [],
         ProductMetadataInterface $productMetadata,
         Data $dataHelper,
-        ObjectManagerInterface $objectManager
+        ObjectManagerInterface $objectManager,
+        array $data = []
     ) {
         parent::__construct($context, $data);
         $this->productMetadata = $productMetadata;
